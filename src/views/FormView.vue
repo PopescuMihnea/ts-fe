@@ -85,7 +85,6 @@ let apiNames =
       )
     : defaultApiNames;
 
-console.log("Request urls: ", urls);
 const checkEnv = () => {
   if (process.env.VUE_APP_AI_API_URLS == undefined) {
     console.warn(`Env url data undefined, using default: ${defaultUrls}`);
