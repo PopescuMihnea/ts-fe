@@ -42,6 +42,25 @@ function isStringEmotionResults(
   return typeof results === "string";
 }
 
+function isJSONParseable(result: string) {
+  try {
+    JSON.parse(result);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isEmotionScoresString(
+  results: string | EmotionScores
+): results is EmotionScores {
+  try {
+    return isEmotionScoresEmotionResults(JSON.parse(results as string));
+  } catch {
+    return false;
+  }
+}
+
 function isEmotionScoresEmotionResults(
   results: EmotionScores | string | object
 ): results is EmotionScores {
@@ -82,4 +101,6 @@ export {
   isOllamaResponse,
   isEmoResponse,
   isResponseOrCustomError,
+  isEmotionScoresString,
+  isJSONParseable,
 };

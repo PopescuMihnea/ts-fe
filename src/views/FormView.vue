@@ -21,10 +21,9 @@ import { isEmoResponse, isOllamaResponse } from "@/utils/typeGuards";
 import EmoAccordion from "@/components/EmoAccordion.vue";
 
 //Use these if fetch is not working for some reason to showcase front end
-const placeholderResults: Ref<{
+const mockResults: Ref<{
   [key: string]: EmotionResponse | { [key: string]: EmotionResponse };
 }> = ref({
-  llm: "lau",
   emo: {
     text_0: {
       BioBert: {
@@ -51,20 +50,7 @@ const placeholderResults: Ref<{
       },
     },
   },
-  olama: { error: "feafea" },
-  tamp: {
-    text_3: "geafea",
-    text_4: { a: 3, b: "fea", anger: 0.3 },
-    text_0: {
-      anger: 0.0387,
-      calmness: 0.0,
-      disgust: 0.0066,
-      eagerness: 0.0005,
-      fear: 0.0004,
-      joy: 0.0053,
-      pleasantness: 0.0001,
-      sadness: 0.9483,
-    },
+  ollama: {
     text_1: {
       anger: 0.0021,
       calmness: 0.0016,
@@ -81,7 +67,6 @@ const results: Ref<{
   [key: string]: EmotionResponse | { [key: string]: EmotionResponse };
 }> = ref({});
 
-const fetchTimeoutSeconds = 5;
 const sep = ",";
 const defaultUrls = [
   "http://localhost:5000/predict",
@@ -133,6 +118,7 @@ const models: string[] = [
 ];
 const majorityVotingModel = "MajorityVoting";
 const maxReviews = 5;
+const mockRequests = false;
 
 const arraySchema = Yup.string()
   .trim()
@@ -243,21 +229,30 @@ const onSubmit = handleSubmit(async (values) => {
   }, 100);
 
   resetForm();
-  results.value = {};
-  for (let apiName of apiNames) {
-    results.value[apiName] = {};
-  }
+
   const requests: Promise<void>[] = [];
+  if (!mockRequests) {
+    results.value = {};
+    for (let apiName of apiNames) {
+      results.value[apiName] = {};
+    }
 
-  for (let i = 0; i < urls.length; ++i) {
-    const url = urls[i];
-    const apiName = apiNames[i];
+    for (let i = 0; i < urls.length; ++i) {
+      const url = urls[i];
+      const apiName = apiNames[i];
 
-    requests.push(fetchData(url, values, apiName));
+      requests.push(fetchData(url, values, apiName));
+    }
   }
 
   successfulSubmit.value = true;
-  await Promise.all(requests);
+
+  if (!mockRequests) {
+    await Promise.all(requests);
+  } else {
+    results.value = mockResults.value;
+  }
+
   console.log("Result value", results.value);
 });
 
